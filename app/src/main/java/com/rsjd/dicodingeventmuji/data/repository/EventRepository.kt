@@ -1,5 +1,6 @@
 package com.rsjd.dicodingeventmuji.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.rsjd.dicodingeventmuji.data.api.ApiService
@@ -14,55 +15,66 @@ class EventRepository(
     private val apiService: ApiService,
     private val eventDao: EventDao
 ) {
+    private val TAG = "EventRepository"
+
     fun getActiveEvents(): LiveData<EventResult<List<Event>>> = liveData {
         emit(EventResult.Loading)
         try {
             val response = apiService.getActiveEvents()
-            val events = response.map { EventEntity.fromDomain(it) }
+            val events = response.events.map { EventEntity.fromDomain(it) }
             eventDao.deleteEventsByType(isActive = true)
             eventDao.insertEvents(events)
+            emit(EventResult.Success(response.events))
         } catch (e: Exception) {
+            Log.e(TAG, "Error getting active events: ${e.message}", e)
             emit(EventResult.Error(e.message ?: "An error occurred"))
-        }
 
-        eventDao.getActiveEvents()
-            .map { entities ->
-                entities.map { it.toDomain() }
-            }
-            .collect { events ->
-                emit(EventResult.Success(events))
-            }
+            // Try to get from database if API fails
+            eventDao.getActiveEvents()
+                .map { entities ->
+                    entities.map { it.toDomain() }
+                }
+                .collect { events ->
+                    emit(EventResult.Success(events))
+                }
+        }
     }
 
     fun getFinishedEvents(): LiveData<EventResult<List<Event>>> = liveData {
         emit(EventResult.Loading)
         try {
             val response = apiService.getFinishedEvents()
-            val events = response.map { EventEntity.fromDomain(it) }
+            val events = response.events.map { EventEntity.fromDomain(it) }
             eventDao.deleteEventsByType(isActive = false)
             eventDao.insertEvents(events)
+            emit(EventResult.Success(response.events))
         } catch (e: Exception) {
+            Log.e(TAG, "Error getting finished events: ${e.message}", e)
             emit(EventResult.Error(e.message ?: "An error occurred"))
-        }
 
-        eventDao.getFinishedEvents()
-            .map { entities ->
-                entities.map { it.toDomain() }
-            }
-            .collect { events ->
-                emit(EventResult.Success(events))
-            }
+            // Try to get from database if API fails
+            eventDao.getFinishedEvents()
+                .map { entities ->
+                    entities.map { it.toDomain() }
+                }
+                .collect { events ->
+                    emit(EventResult.Success(events))
+                }
+        }
     }
 
     fun getEventDetail(id: String): LiveData<EventResult<Event>> = liveData {
         emit(EventResult.Loading)
         try {
             val response = apiService.getEventDetail(id)
-            emit(EventResult.Success(response))
+            emit(EventResult.Success(response.event))
             // Cache the event detail
-            eventDao.insertEvents(listOf(EventEntity.fromDomain(response)))
+            eventDao.insertEvents(listOf(EventEntity.fromDomain(response.event)))
         } catch (e: Exception) {
+            Log.e(TAG, "Error getting event detail: ${e.message}", e)
             emit(EventResult.Error(e.message ?: "An error occurred"))
+
+            // Try to get from database if API fails
             eventDao.getEventById(id)
                 .collect { entity ->
                     entity?.let {
@@ -90,9 +102,12 @@ class EventRepository(
         emit(EventResult.Loading)
         try {
             val response = apiService.searchEvents(query = query)
-            emit(EventResult.Success(response))
+            emit(EventResult.Success(response.events))
         } catch (e: Exception) {
+            Log.e(TAG, "Error searching events: ${e.message}", e)
             emit(EventResult.Error(e.message ?: "An error occurred"))
+
+            // Try to get from database if API fails
             eventDao.searchEvents(query)
                 .map { entities ->
                     entities.map { it.toDomain() }
@@ -105,19 +120,23 @@ class EventRepository(
 
     // API methods
     suspend fun getActiveEventsFromApi(): List<Event> {
-        return apiService.getActiveEvents()
+        val response = apiService.getActiveEvents()
+        return response.events
     }
 
     suspend fun getFinishedEventsFromApi(): List<Event> {
-        return apiService.getFinishedEvents()
+        val response = apiService.getFinishedEvents()
+        return response.events
     }
 
     suspend fun getEventDetailFromApi(id: String): Event {
-        return apiService.getEventDetail(id)
+        val response = apiService.getEventDetail(id)
+        return response.event
     }
 
     suspend fun searchEventsFromApi(query: String, active: Int = -1): List<Event> {
-        return apiService.searchEvents(active, query)
+        val response = apiService.searchEvents(active, query)
+        return response.events
     }
 
     // Database methods
