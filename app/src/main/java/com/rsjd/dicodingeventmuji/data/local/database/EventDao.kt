@@ -13,7 +13,7 @@ interface EventDao {
     suspend fun insertEvents(events: List<EventEntity>)
 
     @Query("SELECT * FROM events WHERE isActive = 1")
-    fun getActiveEvents(): Flow<List<EventEntity>>
+    fun getActiveEvents(): Flow<List<EventEntity>?>
 
     @Query("SELECT * FROM events WHERE isActive = 0")
     fun getFinishedEvents(): Flow<List<EventEntity>>

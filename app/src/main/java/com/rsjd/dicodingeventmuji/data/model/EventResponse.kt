@@ -10,5 +10,5 @@ data class EventResponse(
     val message: String,
 
     @SerializedName("data")
-    val events: List<Event>
+    val events: List<Event> = emptyList()
 )

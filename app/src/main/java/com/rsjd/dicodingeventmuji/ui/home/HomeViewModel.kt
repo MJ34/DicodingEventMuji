@@ -12,10 +12,12 @@ import kotlinx.coroutines.launch
 class HomeViewModel(private val repository: EventRepository) : ViewModel() {
 
     private val _activeEvents = MutableLiveData<EventResult<List<Event>>>()
-    val activeEvents: LiveData<EventResult<List<Event>>> = _activeEvents
-
-    private val _finishedEvents = MutableLiveData<EventResult<List<Event>>>()
-    val finishedEvents: LiveData<EventResult<List<Event>>> = _finishedEvents
+//    val activeEvents: LiveData<EventResult<List<Event>>> = _activeEvents
+//
+   private val _finishedEvents = MutableLiveData<EventResult<List<Event>>>()
+//    val finishedEvents: LiveData<EventResult<List<Event>>> = _finishedEvents
+    val activeEvents: LiveData<EventResult<List<Event>>> = repository.getActiveEvents()
+    val finishedEvents: LiveData<EventResult<List<Event>>> = repository.getFinishedEvents()
 
     fun getActiveEvents() {
         viewModelScope.launch {

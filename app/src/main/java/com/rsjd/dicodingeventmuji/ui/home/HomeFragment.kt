@@ -2,6 +2,7 @@ package com.rsjd.dicodingeventmuji.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ class HomeFragment : Fragment() {
         ViewModelFactory.getInstance(requireContext())
     }
 
+    // Deklarasikan adapter sebagai properti kelas
     private lateinit var upcomingAdapter: EventHorizontalAdapter
     private lateinit var finishedAdapter: EventAdapter
 
@@ -42,12 +44,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d("HomeFragment", "onViewCreated called")
         setupRecyclerViews()
         setupClickListeners()
         observeViewModel()
     }
 
     private fun setupRecyclerViews() {
+        Log.d("HomeFragment", "Setting up recycler views")
+
         // Setup upcoming events horizontal recyclerview
         upcomingAdapter = EventHorizontalAdapter { event ->
             navigateToDetail(event)
@@ -87,16 +92,22 @@ class HomeFragment : Fragment() {
         }
 
         binding.viewErrorUpcoming.btnRetry.setOnClickListener {
-            viewModel.getActiveEvents()
+            // Repository.getActiveEvents() will be called again when the LiveData is observed
+            // forcing a refresh might be required depending on your implementation
         }
 
         binding.viewErrorFinished.btnRetry.setOnClickListener {
-            viewModel.getFinishedEvents()
+            // Repository.getFinishedEvents() will be called again when the LiveData is observed
+            // forcing a refresh might be required depending on your implementation
         }
     }
 
     private fun observeViewModel() {
+        Log.d("HomeFragment", "Observing view model")
+
+        // Observe active events
         viewModel.activeEvents.observe(viewLifecycleOwner) { result ->
+            Log.d("HomeFragment", "Active events state: $result")
             when (result) {
                 is EventResult.Loading -> {
                     binding.shimmerUpcoming.visibility = View.VISIBLE
@@ -105,6 +116,7 @@ class HomeFragment : Fragment() {
                     binding.shimmerUpcoming.startShimmer()
                 }
                 is EventResult.Success -> {
+                    Log.d("HomeFragment", "Received ${result.data.size} active events")
                     binding.shimmerUpcoming.stopShimmer()
                     binding.shimmerUpcoming.visibility = View.GONE
                     binding.rvUpcomingEvents.visibility = View.VISIBLE
@@ -112,6 +124,7 @@ class HomeFragment : Fragment() {
                     upcomingAdapter.submitList(result.data.take(5))
                 }
                 is EventResult.Error -> {
+                    Log.e("HomeFragment", "Error loading active events: ${result.error}")
                     binding.shimmerUpcoming.stopShimmer()
                     binding.shimmerUpcoming.visibility = View.GONE
                     binding.rvUpcomingEvents.visibility = View.GONE
@@ -121,7 +134,9 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Observe finished events
         viewModel.finishedEvents.observe(viewLifecycleOwner) { result ->
+            Log.d("HomeFragment", "Finished events state: $result")
             when (result) {
                 is EventResult.Loading -> {
                     binding.shimmerFinished.visibility = View.VISIBLE
@@ -130,6 +145,7 @@ class HomeFragment : Fragment() {
                     binding.shimmerFinished.startShimmer()
                 }
                 is EventResult.Success -> {
+                    Log.d("HomeFragment", "Received ${result.data.size} finished events")
                     binding.shimmerFinished.stopShimmer()
                     binding.shimmerFinished.visibility = View.GONE
                     binding.rvFinishedEvents.visibility = View.VISIBLE
@@ -137,6 +153,7 @@ class HomeFragment : Fragment() {
                     finishedAdapter.submitList(result.data.take(5))
                 }
                 is EventResult.Error -> {
+                    Log.e("HomeFragment", "Error loading finished events: ${result.error}")
                     binding.shimmerFinished.stopShimmer()
                     binding.shimmerFinished.visibility = View.GONE
                     binding.rvFinishedEvents.visibility = View.GONE
@@ -146,9 +163,8 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Load the data
-        viewModel.getActiveEvents()
-        viewModel.getFinishedEvents()
+        // Tidak perlu lagi memanggil viewModel.getActiveEvents() atau viewModel.getFinishedEvents()
+        // karena LiveData dari repository akan otomatis dimuat saat diobservasi
     }
 
     private fun navigateToDetail(event: Event) {
