@@ -6,40 +6,38 @@
     <string name="title_active">Active</string>
     <string name="title_finished">Finished</string>
 
+    <string name="upcoming">Upcoming</string>
+    <string name="finished">Finished</string>
+    <string name="date_time">Date &amp; Time: </string>
+    <string name="remaining_quota">Remaining Quota:</string>
+
+    <string name="error_message">Terjadi kesalahan saat memuat data</string>
+    <string name="retry">Coba Lagi</string>
+    <string name="no_events_found">Tidak ada event yang ditemukan</string>
+    <string name="no_internet_connection">Tidak ada koneksi internet</string>
+
     <!-- Home Fragment -->
     <string name="upcoming_events">Upcoming Events</string>
     <string name="finished_events">Finished Events</string>
     <string name="see_all">See All</string>
 
     <!-- Event List -->
-    <string name="search_events">Search Events</string>
-    <string name="search">Search</string>
     <string name="event_logo">Event Logo</string>
     <string name="event_image">Event Image</string>
 
     <!-- Detail Event -->
     <string name="event_detail">Event Detail</string>
     <string name="organizer">Organizer:</string>
-    <string name="date">Date:</string>
-    <string name="quota_remaining">Quota Remaining:</string>
+    <string name="date">Date: </string>
+    <string name="quota_remaining">Kuota: </string>
+    <string name="quota_format">%1$d / %2$d</string>
     <string name="description">Description</string>
     <string name="register">Register</string>
 
     <!-- Error State -->
     <string name="error_title">Oops! Something went wrong</string>
-    <string name="error_message">We couldn\'t load the data. Please check your internet connection and try again.</string>
-    <string name="retry">Retry</string>
-
     <!-- Empty State -->
     <string name="empty_title">No Events Found</string>
     <string name="empty_message">There are no events matching your search criteria.</string>
 
-    <!-- Network Connection -->
-    <string name="network_status">Network Status</string>
-    <string name="connection_restored">Internet connection restored</string>
-    <string name="connection_lost">No internet connection</string>
-    <string name="connection_weak">Weak internet connection</string>
-
-    <!-- Toast -->
-    <string name="toast_icon">Toast Icon</string>
 </resources>

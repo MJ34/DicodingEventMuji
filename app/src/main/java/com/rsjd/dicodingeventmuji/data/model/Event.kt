@@ -6,36 +6,45 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Event(
-    @SerializedName("id")
-    val id: String,
+    @field:SerializedName("id")
+    val id: Int,
 
-    @SerializedName("name")
+    @field:SerializedName("name")
     val name: String,
 
-    @SerializedName("ownerName")
-    val ownerName: String,
+    @field:SerializedName("summary")
+    val summary: String,
 
-    @SerializedName("beginTime")
-    val beginTime: String,
-
-    @SerializedName("quota")
-    val quota: Int,
-
-    @SerializedName("registrant")
-    val registrant: Int,
-
-    @SerializedName("description")
+    @field:SerializedName("description")
     val description: String,
 
-    @SerializedName("link")
-    val link: String,
+    @field:SerializedName("imageLogo")
+    val imageLogo: String,
 
-    @SerializedName("imageLogo")
-    val imageLogo: String? = null,
+    @field:SerializedName("mediaCover")
+    val mediaCover: String,
 
-    @SerializedName("mediaCover")
-    val mediaCover: String? = null,
+    @field:SerializedName("category")
+    val category: String,
 
-    @SerializedName("active")
-    val isActive: Boolean
+    @field:SerializedName("ownerName")
+    val ownerName: String,
+
+    @field:SerializedName("cityName")
+    val cityName: String,
+
+    @field:SerializedName("quota")
+    val quota: Int,
+
+    @field:SerializedName("registrants")
+    val registrants: Int,
+
+    @field:SerializedName("beginTime")
+    val beginTime: String,
+
+    @field:SerializedName("endTime")
+    val endTime: String,
+
+    @field:SerializedName("link")
+    val link: String
 ) : Parcelable

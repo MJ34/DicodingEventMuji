@@ -1,9 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.DicodingEventMuji" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
     </style>
+    <style name="Theme.DicodingEventMuji.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.DicodingEventMuji.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.DicodingEventMuji.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="Theme.DicodingEventMuji" parent="Base.Theme.DicodingEventMuji" />
-    <style name="Theme.DicodingEventMuji.SplashScreen" parent="Theme.DicodingEventMuji">
-        <item name="android:windowBackground">@drawable/bg_splash</item>
-    </style>
 </resources>

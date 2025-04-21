@@ -3,35 +3,26 @@ package com.rsjd.dicodingeventmuji.utils
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.rsjd.dicodingeventmuji.data.api.ApiConfig
 import com.rsjd.dicodingeventmuji.data.repository.EventRepository
-import com.rsjd.dicodingeventmuji.di.Injection
-import com.rsjd.dicodingeventmuji.ui.detail.DetailEventViewModel
-import com.rsjd.dicodingeventmuji.ui.event.active.ActiveEventViewModel
-import com.rsjd.dicodingeventmuji.ui.event.finished.FinishedEventViewModel
-import com.rsjd.dicodingeventmuji.ui.home.HomeViewModel
-import com.rsjd.dicodingeventmuji.ui.search.SearchViewModel
+import com.rsjd.dicodingeventmuji.ui.detail.DetailViewModel
+import com.rsjd.dicodingeventmuji.ui.event.finished.FinishedViewModel
+import com.rsjd.dicodingeventmuji.ui.event.upcoming.UpcomingViewModel
 
-class ViewModelFactory private constructor(
-    private val repository: EventRepository
-) : ViewModelProvider.NewInstanceFactory() {
+class ViewModelFactory private constructor(private val eventRepository: EventRepository) :
+    ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
-            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
-                HomeViewModel(repository) as T
+            modelClass.isAssignableFrom(UpcomingViewModel::class.java) -> {
+                UpcomingViewModel(eventRepository) as T
             }
-            modelClass.isAssignableFrom(ActiveEventViewModel::class.java) -> {
-                ActiveEventViewModel(repository) as T
+            modelClass.isAssignableFrom(FinishedViewModel::class.java) -> {
+                FinishedViewModel(eventRepository) as T
             }
-            modelClass.isAssignableFrom(FinishedEventViewModel::class.java) -> {
-                FinishedEventViewModel(repository) as T
-            }
-            modelClass.isAssignableFrom(DetailEventViewModel::class.java) -> {
-                DetailEventViewModel(repository) as T
-            }
-            modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
-                SearchViewModel(repository) as T
+            modelClass.isAssignableFrom(DetailViewModel::class.java) -> {
+                DetailViewModel(eventRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
@@ -39,15 +30,15 @@ class ViewModelFactory private constructor(
 
     companion object {
         @Volatile
-        private var INSTANCE: ViewModelFactory? = null
+        private var instance: ViewModelFactory? = null
 
-        fun getInstance(context: Context): ViewModelFactory {
-            return INSTANCE ?: synchronized(this) {
-                val repository = Injection.provideRepository(context)
-                ViewModelFactory(repository).also {
-                    INSTANCE = it
-                }
+        fun getInstance(context: Context): ViewModelFactory =
+            instance ?: synchronized(this) {
+                instance ?: ViewModelFactory(
+                    EventRepository.getInstance(
+                        ApiConfig.getApiService()
+                    )
+                ).also { instance = it }
             }
-        }
     }
 }

@@ -3,12 +3,15 @@ package com.rsjd.dicodingeventmuji.data.model
 import com.google.gson.annotations.SerializedName
 
 data class EventResponse(
-    @SerializedName("error")
+    @field:SerializedName("error")
     val error: Boolean,
 
-    @SerializedName("message")
+    @field:SerializedName("message")
     val message: String,
 
-    @SerializedName("data")
-    val events: List<Event> = emptyList()
+    @field:SerializedName("listEvents")
+    val listEvents: List<Event> = emptyList(),
+
+    @field:SerializedName("event")
+    val event: Event? = null
 )

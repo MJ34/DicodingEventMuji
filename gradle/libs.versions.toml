@@ -23,6 +23,7 @@ roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
 workRuntimeKtx = "2.9.1"
 preferenceKtx = "1.2.1"
+swiperefreshlayout = "1.1.0"
 
 [libraries]
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -56,6 +57,7 @@ shimmer = { group = "com.facebook.shimmer", name = "shimmer", version = "0.5.0" 
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.5.0" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version = "1.0.1" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

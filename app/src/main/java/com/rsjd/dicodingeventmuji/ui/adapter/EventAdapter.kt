@@ -10,49 +10,41 @@ import com.rsjd.dicodingeventmuji.data.model.Event
 import com.rsjd.dicodingeventmuji.databinding.ItemEventBinding
 import com.rsjd.dicodingeventmuji.utils.DateFormatter
 
-class EventAdapter(private val onItemClick: (Event) -> Unit) :
-    ListAdapter<Event, EventAdapter.EventViewHolder>(DIFF_CALLBACK) {
+class EventAdapter : ListAdapter<Event, EventAdapter.EventViewHolder>(DIFF_CALLBACK) {
+
+    private var onItemClickListener: ((Event) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Event) -> Unit) {
+        onItemClickListener = listener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
-        val binding = ItemEventBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val binding = ItemEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return EventViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val event = getItem(position)
+        holder.bind(event)
     }
 
-    inner class EventViewHolder(private val binding: ItemEventBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        init {
-            binding.root.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(getItem(position))
-                }
-            }
-        }
-
+    inner class EventViewHolder(private val binding: ItemEventBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(event: Event) {
-            with(binding) {
+            binding.apply {
                 tvEventName.text = event.name
-                tvOrganizer.text = event.ownerName
-                tvDate.text = DateFormatter.formatDate(event.beginTime)
+                tvEventSummary.text = event.summary
 
-                val quotaText = "${event.quota - event.registrant} / ${event.quota}"
-                tvQuota.text = quotaText
+                // Format date
+                tvEventDate.text = DateFormatter.formatDate(event.beginTime)
 
-                // Load event logo
-                val imageUrl = event.imageLogo ?: event.mediaCover
-                if (!imageUrl.isNullOrEmpty()) {
-                    Glide.with(itemView.context)
-                        .load(imageUrl)
-                        .into(ivEventLogo)
+                // Load image with Glide
+                Glide.with(itemView.context)
+                    .load(event.imageLogo)
+                    .into(ivEventLogo)
+
+                // Set click listener
+                root.setOnClickListener {
+                    onItemClickListener?.invoke(event)
                 }
             }
         }
