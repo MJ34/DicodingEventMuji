@@ -3,7 +3,6 @@ package com.rsjd.dicodingeventmuji.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Html
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -24,6 +23,8 @@ class DetailActivity : AppCompatActivity() {
     private val viewModel: DetailViewModel by viewModels {
         ViewModelFactory.getInstance(this)
     }
+    private var currentEvent: Event? = null
+    private var isFavorite: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +38,8 @@ class DetailActivity : AppCompatActivity() {
         viewModel.getEventDetail(eventId)
 
         observeEventDetail()
+        observeFavoriteStatus(eventId)
+        setupFavoriteButton()
     }
 
     private fun observeEventDetail() {
@@ -50,6 +53,7 @@ class DetailActivity : AppCompatActivity() {
                     showLoading(false)
                     hideError()
                     resource.data?.let { event ->
+                        currentEvent = event
                         populateUI(event)
                     }
                 }
@@ -61,23 +65,46 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeFavoriteStatus(eventId: Int) {
+        viewModel.isFavorite(eventId).observe(this) { isFav ->
+            isFavorite = isFav
+            updateFavoriteButton(isFav)
+        }
+    }
+
+    private fun setupFavoriteButton() {
+        binding.fabFavorite.setOnClickListener {
+            currentEvent?.let { event ->
+                if (isFavorite) {
+                    viewModel.removeFromFavorite(event.id)
+                    Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.addToFavorite(event)
+                    Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun updateFavoriteButton(isFavorite: Boolean) {
+        if (isFavorite) {
+            binding.fabFavorite.setImageResource(R.drawable.ic_favorite_filled)
+            binding.fabFavorite.contentDescription = getString(R.string.remove_from_favorite)
+        } else {
+            binding.fabFavorite.setImageResource(R.drawable.ic_favorite_border)
+            binding.fabFavorite.contentDescription = getString(R.string.add_to_favorite)
+        }
+    }
+
     private fun populateUI(event: Event) {
         binding.apply {
-            // Pastikan nullcheck untuk semua field
             tvEventName.text = event.name
             tvOrganizer.text = event.ownerName
             tvDate.text = DateFormatter.formatDate(event.beginTime)
-
-            // String format dengan format yang benar
-            // Perbaiki format string di strings.xml
             tvQuota.text = String.format(getString(R.string.quota_format),
                 event.quota - event.registrants, event.quota)
-
-            // Set HTML description dengan safety check
             tvDescription.text = HtmlCompat.fromHtml(event.description, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
-
-            // Load cover image dengan safety check
             try {
                 Glide.with(this@DetailActivity)
                     .load(event.mediaCover)
@@ -86,7 +113,6 @@ class DetailActivity : AppCompatActivity() {
                 // Handle error loading image
             }
 
-            // Set register button dengan safety check
             btnRegister.setOnClickListener {
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.link))
@@ -106,10 +132,12 @@ class DetailActivity : AppCompatActivity() {
             binding.shimmerLayout.startShimmer()
             binding.contentLayout.visibility = View.GONE
             binding.viewError.root.visibility = View.GONE
+            binding.fabFavorite.visibility = View.GONE
         } else {
             binding.shimmerLayout.stopShimmer()
             binding.shimmerLayout.visibility = View.GONE
             binding.contentLayout.visibility = View.VISIBLE
+            binding.fabFavorite.visibility = View.VISIBLE
         }
     }
 
@@ -117,6 +145,7 @@ class DetailActivity : AppCompatActivity() {
         binding.viewError.root.visibility = View.VISIBLE
         binding.viewError.tvError.text = message
         binding.contentLayout.visibility = View.GONE
+        binding.fabFavorite.visibility = View.GONE
         binding.viewError.btnRetry.setOnClickListener {
             val eventId = intent.getIntExtra(EXTRA_EVENT_ID, 0)
             viewModel.getEventDetail(eventId)

@@ -21,4 +21,18 @@ class DetailViewModel(private val repository: EventRepository) : ViewModel() {
             }
         }
     }
+
+    fun isFavorite(id: Int): LiveData<Boolean> = repository.isFavorite(id)
+
+    fun addToFavorite(event: Event) {
+        viewModelScope.launch {
+            repository.addToFavorite(event)
+        }
+    }
+
+    fun removeFromFavorite(eventId: Int) {
+        viewModelScope.launch {
+            repository.removeFromFavorite(eventId)
+        }
+    }
 }

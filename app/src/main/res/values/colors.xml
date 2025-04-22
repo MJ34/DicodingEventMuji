@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Material Colors -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,11 +8,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- App Colors -->
     <color name="primary">#FF3700B3</color>
+    <color name="primary_dark">#FF3700B3</color>
     <color name="second">#F5F5F5</color>
     <color name="favorite">#48CFCB</color>
 
-    <!-- App specific colors -->
+    <!-- Light Theme Colors -->
     <color name="divider">#E0E0E0</color>
     <color name="shimmer_color">#DDDDDD</color>
     <color name="search_background">#F5F5F5</color>
@@ -19,7 +23,13 @@
     <color name="active_event">#4CAF50</color>
     <color name="finished_event">#FF9800</color>
 
-    !-- Connection State Colors -->
+    <!-- Dark Theme Colors -->
+    <color name="dark_divider">#424242</color>
+    <color name="dark_shimmer_color">#424242</color>
+    <color name="dark_search_background">#2C2C2C</color>
+    <color name="dark_search_stroke">#424242</color>
+
+    <!-- Connection State Colors -->
     <color name="connection_available">#4CAF50</color>
     <color name="connection_lost">#F44336</color>
     <color name="connection_losing">#FF9800</color>

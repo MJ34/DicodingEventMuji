@@ -1,6 +1,9 @@
 package com.rsjd.dicodingeventmuji.data.repository
 
+import androidx.lifecycle.LiveData
 import com.rsjd.dicodingeventmuji.data.api.ApiService
+import com.rsjd.dicodingeventmuji.data.local.dao.FavoriteEventDao
+import com.rsjd.dicodingeventmuji.data.local.entity.FavoriteEvent
 import com.rsjd.dicodingeventmuji.data.model.Event
 import com.rsjd.dicodingeventmuji.utils.Resource
 import kotlinx.coroutines.Dispatchers
@@ -8,7 +11,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class EventRepository(private val apiService: ApiService) {
+class EventRepository(
+    private val apiService: ApiService,
+    private val favoriteEventDao: FavoriteEventDao
+) {
 
     fun getUpcomingEvents(): Flow<Resource<List<Event>>> = flow {
         emit(Resource.Loading())
@@ -50,8 +56,7 @@ class EventRepository(private val apiService: ApiService) {
                 // Cek apakah respons memiliki listEvents yang tidak kosong
                 else if (response.listEvents.isNotEmpty()) {
                     emit(Resource.Success(response.listEvents[0]))
-                }
-                else {
+                } else {
                     emit(Resource.Error("Event tidak ditemukan"))
                 }
             } else {
@@ -62,13 +67,52 @@ class EventRepository(private val apiService: ApiService) {
         }
     }.flowOn(Dispatchers.IO)
 
+    // Favorite Event Functions
+    fun getAllFavorites(): LiveData<List<FavoriteEvent>> = favoriteEventDao.getAllFavorites()
+
+    fun isFavorite(id: Int): LiveData<Boolean> = favoriteEventDao.isFavorite(id)
+
+    suspend fun addToFavorite(event: Event) {
+        val favoriteEvent = FavoriteEvent(
+            id = event.id,
+            name = event.name,
+            summary = event.summary,
+            description = event.description,
+            imageLogo = event.imageLogo,
+            mediaCover = event.mediaCover,
+            category = event.category,
+            ownerName = event.ownerName,
+            cityName = event.cityName,
+            quota = event.quota,
+            registrants = event.registrants,
+            beginTime = event.beginTime,
+            endTime = event.endTime,
+            link = event.link
+        )
+        favoriteEventDao.insertFavorite(favoriteEvent)
+    }
+
+    suspend fun removeFromFavorite(eventId: Int) {
+        val favoriteEvent = favoriteEventDao.getFavoriteById(eventId).value
+        if (favoriteEvent != null) {
+            favoriteEventDao.deleteFavorite(favoriteEvent)
+        }
+    }
+
+    suspend fun removeFromFavorite(favoriteEvent: FavoriteEvent) {
+        favoriteEventDao.deleteFavorite(favoriteEvent)
+    }
+
     companion object {
         @Volatile
         private var instance: EventRepository? = null
 
-        fun getInstance(apiService: ApiService): EventRepository =
+        fun getInstance(
+            apiService: ApiService,
+            favoriteEventDao: FavoriteEventDao
+        ): EventRepository =
             instance ?: synchronized(this) {
-                instance ?: EventRepository(apiService).also { instance = it }
+                instance ?: EventRepository(apiService, favoriteEventDao).also { instance = it }
             }
     }
 }
