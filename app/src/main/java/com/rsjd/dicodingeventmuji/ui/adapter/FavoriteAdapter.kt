@@ -33,7 +33,15 @@ class FavoriteAdapter : ListAdapter<FavoriteEvent, FavoriteAdapter.FavoriteViewH
             binding.apply {
                 tvEventName.text = favorite.name
                 tvEventSummary.text = favorite.summary
-                tvEventDate.text = DateFormatter.formatDate(favorite.beginTime)
+
+                // Tambahkan null check
+                tvEventDate.text = favorite.beginTime?.let {
+                    try {
+                        DateFormatter.formatDate(it)
+                    } catch (e: Exception) {
+                        "Tanggal tidak valid"
+                    }
+                } ?: "Tanggal tidak tersedia"
 
                 Glide.with(itemView.context)
                     .load(favorite.imageLogo)

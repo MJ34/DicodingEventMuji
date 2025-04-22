@@ -1,5 +1,6 @@
 package com.rsjd.dicodingeventmuji.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.rsjd.dicodingeventmuji.data.api.ApiService
 import com.rsjd.dicodingeventmuji.data.local.dao.FavoriteEventDao
@@ -92,10 +93,19 @@ class EventRepository(
         favoriteEventDao.insertFavorite(favoriteEvent)
     }
 
-    suspend fun removeFromFavorite(eventId: Int) {
-        val favoriteEvent = favoriteEventDao.getFavoriteById(eventId).value
-        if (favoriteEvent != null) {
-            favoriteEventDao.deleteFavorite(favoriteEvent)
+    suspend fun removeFromFavorite(eventId: Int): Boolean {
+        return try {
+            // Gunakan metode query langsung
+            val favoriteEvent = favoriteEventDao.getFavoriteByIdDirect(eventId)
+            if (favoriteEvent != null) {
+                val deletedRows = favoriteEventDao.deleteFavorite(favoriteEvent)
+                deletedRows > 0
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("EventRepository", "Error removing favorite", e)
+            false
         }
     }
 

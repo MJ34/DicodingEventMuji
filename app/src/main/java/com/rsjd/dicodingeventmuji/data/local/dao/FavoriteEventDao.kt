@@ -12,11 +12,14 @@ interface FavoriteEventDao {
     @Query("SELECT * FROM favorite_events WHERE id = :id")
     fun getFavoriteById(id: Int): LiveData<FavoriteEvent?>
 
+    @Query("SELECT * FROM favorite_events WHERE id = :id")
+    suspend fun getFavoriteByIdDirect(id: Int): FavoriteEvent?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorite(favoriteEvent: FavoriteEvent)
 
     @Delete
-    suspend fun deleteFavorite(favoriteEvent: FavoriteEvent)
+    suspend fun deleteFavorite(favoriteEvent: FavoriteEvent): Int
 
     @Query("SELECT EXISTS(SELECT * FROM favorite_events WHERE id = :id)")
     fun isFavorite(id: Int): LiveData<Boolean>

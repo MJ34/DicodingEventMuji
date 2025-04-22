@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.rsjd.dicodingeventmuji.data.local.dao.FavoriteEventDao
 import com.rsjd.dicodingeventmuji.data.local.entity.FavoriteEvent
 
-@Database(entities = [FavoriteEvent::class], version = 1, exportSchema = false)
+@Database(entities = [FavoriteEvent::class], version = 2, exportSchema = false)
 abstract class EventDatabase : RoomDatabase() {
 
     abstract fun favoriteEventDao(): FavoriteEventDao
@@ -22,7 +22,9 @@ abstract class EventDatabase : RoomDatabase() {
                     context.applicationContext,
                     EventDatabase::class.java,
                     "event_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()  // Untuk development
+                    .build()
                 INSTANCE = instance
                 instance
             }

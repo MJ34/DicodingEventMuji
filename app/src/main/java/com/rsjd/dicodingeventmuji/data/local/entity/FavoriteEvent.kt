@@ -8,16 +8,16 @@ data class FavoriteEvent(
     @PrimaryKey
     val id: Int,
     val name: String,
-    val summary: String,
-    val description: String,
-    val imageLogo: String,
-    val mediaCover: String,
-    val category: String,
-    val ownerName: String,
-    val cityName: String,
-    val quota: Int,
-    val registrants: Int,
-    val beginTime: String,
-    val endTime: String,
-    val link: String
+    val summary: String? = null,
+    val description: String? = null,
+    val imageLogo: String? = null,
+    val mediaCover: String? = null,
+    val category: String? = null,
+    val ownerName: String? = null,
+    val cityName: String? = null,
+    val quota: Int = 0,
+    val registrants: Int = 0,
+    val beginTime: String? = null,
+    val endTime: String? = null,
+    val link: String? = null
 )

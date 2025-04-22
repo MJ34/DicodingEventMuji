@@ -3,6 +3,7 @@ package com.rsjd.dicodingeventmuji.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -75,13 +76,31 @@ class DetailActivity : AppCompatActivity() {
     private fun setupFavoriteButton() {
         binding.fabFavorite.setOnClickListener {
             currentEvent?.let { event ->
+                Log.d("FavoriteToggle", "Current favorite status: $isFavorite, Event ID: ${event.id}")
                 if (isFavorite) {
                     viewModel.removeFromFavorite(event.id)
-                    Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
                 } else {
                     viewModel.addToFavorite(event)
-                    Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+
+        viewModel.favoriteStatus.observe(this) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    isFavorite = resource.data == true
+                    updateFavoriteButton(isFavorite)
+
+                    val message = if (isFavorite) "Ditambahkan ke favorit" else "Dihapus dari favorit"
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+                    Log.d("FavoriteToggle", "Favorite status updated: $isFavorite")
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show()
+                    Log.e("FavoriteToggle", "Error: ${resource.message}")
+                }
+                else -> {}
             }
         }
     }

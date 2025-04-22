@@ -14,6 +14,9 @@ class DetailViewModel(private val repository: EventRepository) : ViewModel() {
     private val _event = MutableLiveData<Resource<Event>>()
     val event: LiveData<Resource<Event>> = _event
 
+    private val _favoriteStatus = MutableLiveData<Resource<Boolean>>()
+    val favoriteStatus: LiveData<Resource<Boolean>> = _favoriteStatus
+
     fun getEventDetail(id: Int) {
         viewModelScope.launch {
             repository.getEventDetail(id).collect { result ->
@@ -26,13 +29,27 @@ class DetailViewModel(private val repository: EventRepository) : ViewModel() {
 
     fun addToFavorite(event: Event) {
         viewModelScope.launch {
-            repository.addToFavorite(event)
+            try {
+                repository.addToFavorite(event)
+                _favoriteStatus.value = Resource.Success(true)
+            } catch (e: Exception) {
+                _favoriteStatus.value = Resource.Error("Failed to add to favorites")
+            }
         }
     }
 
     fun removeFromFavorite(eventId: Int) {
         viewModelScope.launch {
-            repository.removeFromFavorite(eventId)
+            try {
+                val result = repository.removeFromFavorite(eventId)
+                _favoriteStatus.value = if (result) {
+                    Resource.Success(false)
+                } else {
+                    Resource.Error("Gagal menghapus dari favorit")
+                }
+            } catch (e: Exception) {
+                _favoriteStatus.value = Resource.Error("Error: ${e.message}")
+            }
         }
     }
 }
